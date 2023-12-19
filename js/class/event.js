@@ -8,6 +8,7 @@ class Event {
     #groups;
     #week;
     #type;
+    #duree;
 
     constructor(id, summary, description, start, end, location) {
         this.#id = id;
@@ -22,6 +23,7 @@ class Event {
         this.#groups = this.#groups.map( gr => gr.replace(/\s/g, "") );
 
         this.#week = this.calculateWeek();
+        this.#duree = this.calculateDuree();
 
         if(this.#summary.includes("CM")) {
             this.#type = "CM";
@@ -70,6 +72,10 @@ class Event {
         return this.#type;
     }
 
+    get duree() {
+        return this.#duree;
+    }
+
     // retourne un objet contenant les informations de l'événement
     // dans un format compatible avec Toast UI Calendar (voir https://nhn.github.io/tui.calendar/latest/EventObject)
     toObject() {
@@ -81,7 +87,8 @@ class Event {
             end: this.#end,
             location: this.#location ,
             type: this.#type,
-            week: this.#week
+            week: this.#week,
+            duree: this.#duree
         }
     }
 
@@ -92,6 +99,13 @@ class Event {
         var week1 = new Date(date.getFullYear(), 0, 4);
         return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000
             - 3 + (week1.getDay() + 6) % 7) / 7);
+    }
+
+    calculateDuree() {
+        let diff = this.#end.getTime() - this.#start.getTime();
+        let totalMinutes = diff / (1000 * 60);
+        let hoursDecimal = totalMinutes / 60;
+        return hoursDecimal;
     }
 }
 
