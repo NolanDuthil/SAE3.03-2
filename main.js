@@ -33,16 +33,14 @@ let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3"
 function renderTimes(events) {
     let weeklyHours = {};
     for (let event of events) {
-        if (event.week==undefined) console.log(event);
-        if (weeklyHours[event.week]==undefined) {
+        if (event.week === undefined) {
+            console.log(event);
+            continue;
+        }
+        if (!weeklyHours[event.week]) {
             weeklyHours[event.week] = { CM: 0, TD: 0, TP: 0, Autre: 0 };
         }
-    
-        let durationMilliseconds = event.end - event.start;
-        let durationHours = Math.floor(durationMilliseconds / (1000 * 60 * 60));
-        let durationMinutes = Math.floor((durationMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
-        let durationTotalHours = durationHours + (durationMinutes / 60);
-    
+        let durationTotalHours = event.duree;
         if (event.type === 'CM') {
             weeklyHours[event.week].CM += durationTotalHours;
         }
