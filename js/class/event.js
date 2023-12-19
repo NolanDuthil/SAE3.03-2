@@ -80,7 +80,8 @@ class Event {
             start: this.#start,
             end: this.#end,
             location: this.#location ,
-            type: this.#type
+            type: this.#type,
+            week: this.#week
         }
     }
 

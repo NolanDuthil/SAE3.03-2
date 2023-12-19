@@ -16,6 +16,15 @@ M.getEvents = function(annee) {
     return null;
 }
 
+M.EventAllByGroup = function(tag){
+    let A1 = Events.mmi1.EventByGroup(tag);
+    let A2 = Events.mmi2.EventByGroup(tag);
+    let A3 = Events.mmi3.EventByGroup(tag);
+
+    let result = [...A1, ...A2, ...A3];
+    return result;
+}
+
 M.init = async function() {
     let data = await fetch('./data/mmi1.ics');
     data = await data.text();
