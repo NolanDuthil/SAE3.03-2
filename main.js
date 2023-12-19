@@ -18,8 +18,7 @@ import { V } from "./js/view.js";
 // loadind data (and wait for it !)
 await M.init();
 
-let p = [...M.getEvents("mmi1")];
-console.log(p[0])
+let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
 // let index = {}
 
 // let key = ['fruit','vegetable'];
@@ -29,11 +28,10 @@ console.log(p[0])
 //         return item.type === k;
 //     });
 // }
-let events = M.getEvents("mmi1");
 
 let hoursPerWeek = {};
 
-for (let event of events) {
+for (let event of all) {
     if (!hoursPerWeek[event.week]) {
         hoursPerWeek[event.week] = { hours: 0, minutes: 0 };
     }
