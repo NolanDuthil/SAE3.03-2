@@ -18,6 +18,34 @@ import { V } from "./js/view.js";
 // loadind data (and wait for it !)
 await M.init();
 
+let hoursPerWeek = {};
+
+for (let event of all) {
+    if (!hoursPerWeek[event.week]) {
+        hoursPerWeek[event.week] = { hours: 0, minutes: 0 };
+    }
+
+    let durationMilliseconds = event.end - event.start;
+    let durationHours = Math.floor(durationMilliseconds / (1000 * 60 * 60));
+    let durationMinutes = Math.floor((durationMilliseconds % (1000 * 60 * 60)) / (1000 * 60));
+
+    hoursPerWeek[event.week].hours += durationHours;
+    hoursPerWeek[event.week].minutes += durationMinutes;
+
+    // Convertir les minutes excédentaires en heures si nécessaire
+    if (hoursPerWeek[event.week].minutes >= 60) {
+        let extraHours = Math.floor(hoursPerWeek[event.week].minutes / 60);
+        hoursPerWeek[event.week].hours += extraHours;
+        hoursPerWeek[event.week].minutes %= 60;
+    }
+}
+
+// Convertir les objets hoursPerWeek en tableau pour l'affichage
+let chartData = Object.keys(hoursPerWeek).map(week => ({
+    name: week.toString(), // Convertir le numéro de semaine en chaîne pour le nom
+    y: hoursPerWeek[week].hours + (hoursPerWeek[week].minutes / 60) // Convertir les minutes en heures et les ajouter
+}));
+
   
 var widgetOptions = [
     {
