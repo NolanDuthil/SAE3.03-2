@@ -36,8 +36,6 @@ class Event {
         } else {
             this.#type = "AUTRE";
         }
-        this.#semestre = this.getSemester(summary);
-        this.#category = this.getCategory(summary);
     }
 
     get id() {
@@ -121,33 +119,6 @@ class Event {
         return hoursDecimal;
     }
 
-    getSemester = function (title) {
-        let regexp = /^(R|(SA))[EÉ ]{0,2}[1-6](\.Crea)?(\.DWeb-DI)?\.[0-9]{2}/;
-        let res = title.match(regexp);
-
-        if (res != null) {
-            let digit = res[0].match(/[1-6]{1}/);
-            if (digit != null)
-                return digit[0];
-        }
-
-        return -1;
-    }
-
-    getCategory(title) {
-        let regexp = /^(R|(SAÉ?))[EÉ ]{0,2}([1-6]\.[0-9]{2})/;
-        let res = title.match(regexp);
-    
-        if (res != null) {
-            if (res[1] === "R") {
-                return "Ressource";
-            }
-            else if (res[2] === "SAÉ") {
-                return "SAE";
-            }
-        }
-        return -1;
-    }    
 }
 
 export {Event};
