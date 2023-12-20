@@ -19,6 +19,33 @@ import { V } from "./js/view.js";
 await M.init();
 
 let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
+  
+  // Fonction pour extraire l'heure de fin pour chaque groupe
+  function extractEndTime(all) {
+    let dtEndMatch = all.match(/DTEND:(\d{8}T\d{6}Z)/);
+    let summaryMatch = all.match(/SUMMARY:[^]*BUT1-([^.]+)/);
+  
+    if (dtEndMatch && summaryMatch) {
+      let endTimeString = dtEndMatch[1];
+      let endTime = new Date(endTimeString);
+  
+      let groupsString = summaryMatch[1];
+      let groups = groupsString.split('.');
+  
+      let endTimes = {};
+      groups.forEach(group => {
+        endTimes[group] = endTime;
+      });
+  
+      return endTimes;
+    }
+  
+    return null; // Retourner null si les informations ne peuvent pas être extraites
+  }
+  
+  // Appeler la fonction et afficher les résultats
+  let endTimes = extractEndTime(all);
+  console.log(endTimes);
         
         var chart = JSC.chart('chartDiv', {
             debug: true,
