@@ -2,136 +2,110 @@ import * as JSC from "jscharting";
 import { M } from "./js/model.js";
 import { V } from "./js/view.js";
 
-/*
-   Ce fichier correspond au contrôleur de l'application. Il est chargé de faire le lien entre le modèle et la vue.
-   Le modèle et la vue sont définis dans les fichiers js/model.js et js/view.js et importés (M et V, parties "publiques") dans ce fichier.
-   Le modèle contient les données (les événements des 3 années de MMI).
-   La vue contient tout ce qui est propre à l'interface et en particulier le composant Toast UI Calendar.
-   Le principe sera toujours le même : le contrôleur va récupérer les données du modèle et les passer à la vue.
-   Toute opération de filtrage des données devra être définie dans le modèle.
-   Et en fonction des actions de l'utilisateur, le contrôleur pourra demander au modèle de lui retourner des données filtrées
-   pour ensuite les passer à la vue pour affichage.
-
-   Exception : Afficher 1, 2 ou les 3 années de formation sans autre filtrage peut être géré uniquement au niveau de la vue.
-*/
-
-// loadind data (and wait for it !)
 await M.init();
 
-let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
+let all = M.EventAllByGroup("BUT1-G1");
 
 function renderTimes(events) {
     let series = [];
-
-    // Grouper les événements par semestre
     let groupedBySemestre = {};
+
     events.forEach(event => {
         if (event.semestre === "-1" || event.category === -1) return;
 
         if (!groupedBySemestre[event.semestre]) {
-            groupedBySemestre[event.semestre] = { TP: 0, TD: 0, CM: 0, Autre: 0 };
+            groupedBySemestre[event.semestre] = { Ressource: { CM: 0, TD: 0, TP: 0, Autre: 0 }, SAE: { CM: 0, TD: 0, TP: 0, Autre: 0 }, total: 0 };
         }
 
-        groupedBySemestre[event.semestre][event.type] += event.duree;
+        groupedBySemestre[event.semestre][event.category][event.type] += event.duree;
+        groupedBySemestre[event.semestre].total += event.duree;
     });
 
-    // Pour chaque semestre
     for (let semestre in groupedBySemestre) {
-        let total_duree_du_semestre = Object.values(groupedBySemestre[semestre]).reduce((acc, val) => acc + val, 0);
-
-        series.push({
-            name: '',
-            points: [{ x: semestre, y: total_duree_du_semestre, legendEntry: { sortOrder: parseInt(semestre) } }],
-            shape: { innerSize: '0%', size: '20%' },
-            defaultPoint_label: { text: '<b>%name</b>', placement: 'inside' },
-            palette: ['#F53D01', '#0562F0']
-        });
-
-        // Pour chaque catégorie (Ressource et SAE)
         ['Ressource', 'SAE'].forEach(category => {
-            let data = { CM: 0, TD: 0, TP: 0, Autre: 0 };
-            if (groupedBySemestre[semestre][category]) {
-                data = groupedBySemestre[semestre][category];
-            }
-
-            let points = Object.entries(data).map(([type, duree]) => ({
-                x: `${type} ${semestre}`,
-                y: duree,
-                legendEntry: { sortOrder: (category === 'Ressource' ? 1 : 2), attributes_type: `${category} ${semestre}` }
-            }));
-
-            series.push({
-                name: '',
-                points: points,
-                shape: { innerSize: '60%', size: '40%' },
-                defaultPoint_label: { text: '<b>%name</b>', placement: 'inside' },
-                palette: ['#CC3F2B', '#F04339', '#1314F0', '#4B9DF0']
-            });
+            let data = groupedBySemestre[semestre][category];
+            let total_donnee = data.CM + data.TD + data.TP + data.Autre;
+            
+            series.push([
+                semestre,
+                category,
+                data.CM,
+                data.TD,
+                data.TP,
+                data.Autre,
+                total_donnee
+            ]);
         });
     }
-    console.log(series)
 
     var chart = JSC.chart('chartDiv', {
         debug: true,
         defaultSeries: { type: 'pieDonut', shape_center: '50%,50%' },
         title: {
           label: {
-            text: 'Horraire de cours',
+            text: 'Horraire de cours par Groupe',
             style_fontSize: 16
           },
           position: 'center'
         },
         defaultPoint: {
-          tooltip: '<b>%name</b><br>Revenue: <b>{%yValue:c2}B</b>'
+          tooltip: '<b>%name</b><br>Heures: <b>%Valueh</b>'
         },
-        legend: { template: '{%value:c2}B %icon %name', position: 'right' },
+        legend: { template: '%value h %icon %name', position: 'right' },
         series: [
           {
             name: '',
             points: [
-              { x: "s1", y: 218.12, legendEntry: { sortOrder: 1 } },
-              { x: "S2", y: 239.18, legendEntry: { sortOrder: 3, lineAbove: true } },
+              { x: 'S'+series[0][0], y: series[0][6]+series[1][6], legendEntry: { sortOrder: 1 } },
+              { x: 'S'+series[2][0], y: series[2][6]+series[3][6], legendEntry: { sortOrder: 3, lineAbove: true } },
             ],
             shape: { innerSize: '0%', size: '20%' },
             defaultPoint_label: {
               text: '<b>%name</b>',
               placement: 'inside'
             },
-            palette: ['#F53D01', '#0562F0']
+            palette: ['#8D2C5A', '#006EA3']
           },
           {
           name: '',
             points: [
-              { x: 'Ressource S1', y: 240.12, legendEntry: { sortOrder: 1 }, attributes_type: 'S1' },
-              { x: 'SAE S1', y: 270.18, legendEntry: { sortOrder: 2 }, attributes_type: 'S1' },
-              { x: 'Ressource S2', y: 270.18, legendEntry: { sortOrder: 3 }, attributes_type: 'S2' },
-              { x: 'SAE S2', y: 270.18, legendEntry: { sortOrder: 4}, attributes_type: 'S2' },
+              { x: 'Ressource S'+series[0][0], y: series[0][6], legendEntry: { sortOrder: 1 }, attributes_type: 'S'+series[0][0] },
+              { x: 'SAE S'+series[0][0], y: series[1][6], legendEntry: { sortOrder: 2 }, attributes_type: 'S'+series[0][0] },
+              { x: 'Ressource S'+series[2][0], y: series[2][6], legendEntry: { sortOrder: 3 }, attributes_type: 'S'+series[2][0] },
+              { x: 'SAE S'+series[2][0], y: series[3][6], legendEntry: { sortOrder: 4}, attributes_type: 'S'+series[2][0] },
             ],
             shape: { innerSize: '60%', size: '40%' },
             defaultPoint_label: {
               text: '<b>%name</b>',
               placement: 'inside'
             },
-            palette: ['#CC3F2B', '#F04339', '#1314F0', '#4B9DF0']
+            palette: ['#F4CFDF', '#CA3C66', '#9AC8EB', '#5784BA']
           },
           {
             name: '',
             points: [
-              { x: 'CM', y: 50.56, legendEntry_sortOrder: 2, attributes_type: 'Ressource S1' },
-              { x: 'TD', y: 42.36, legendEntry_sortOrder: 2, attributes_type: 'Ressource S1' },
-              { x: 'TP', y: 46.85, legendEntry_sortOrder: 2, attributes_type: 'Ressource S1' },
-              { x: 'Autre', y: 78.35, legendEntry_sortOrder: 2, attributes_type: 'Ressource S1' },
-              { x: 'CM', y: 50.56, legendEntry_sortOrder: 2, attributes_type: 'SAE S1' },
-              { x: 'TD', y: 42.36, legendEntry_sortOrder: 2, attributes_type: 'SAE S1' },
-              { x: 'TP', y: 46.85, legendEntry_sortOrder: 2, attributes_type: 'SAE S1' },
-              { x: 'Autre', y: 78.35, legendEntry_sortOrder: 2, attributes_type: 'SAE S1' },
+              { x: 'R - CM', y: series[0][2], legendEntry_sortOrder: 2, attributes_type: 'Ressource S'+series[0][0] },
+              { x: 'R - TD', y: series[0][3], legendEntry_sortOrder: 2, attributes_type: 'Ressource S'+series[0][0] },
+              { x: 'R - TP', y: series[0][4], legendEntry_sortOrder: 2, attributes_type: 'Ressource S'+series[0][0] },
+              { x: 'S - CM', y: series[1][2], legendEntry_sortOrder: 2, attributes_type: 'SAE S'+series[0][0] },
+              { x: 'S - TD', y: series[1][3], legendEntry_sortOrder: 2, attributes_type: 'SAE S'+series[0][0] },
+              { x: 'S - TP', y: series[1][4], legendEntry_sortOrder: 2, attributes_type: 'SAE S'+series[0][0] },
+              { x: 'S - Autonomie', y: series[1][5], legendEntry_sortOrder: 2, attributes_type: 'SAE S'+series[0][0] },
+              { x: 'R - CM', y: series[2][2], legendEntry_sortOrder: 4, attributes_type: 'Ressource S'+series[2][0] },
+              { x: 'R - TD', y: series[2][3], legendEntry_sortOrder: 4, attributes_type: 'Ressource S'+series[2][0] },
+              { x: 'R - TP', y: series[2][4], legendEntry_sortOrder: 4, attributes_type: 'Ressource S'+series[2][0] },
+              { x: 'S - CM', y: series[3][2], legendEntry_sortOrder: 4, attributes_type: 'SAE S'+series[2][0] },
+              { x: 'S - TD', y: series[3][3], legendEntry_sortOrder: 4, attributes_type: 'SAE S'+series[2][0] },
+              { x: 'S - TP', y: series[3][4], legendEntry_sortOrder: 4, attributes_type: 'SAE S'+series[2][0] },
+              { x: 'S - Autonomie', y: series[3][5], legendEntry_sortOrder: 4, attributes_type: 'SAE S'+series[2][0] },
+
             ],
-            defaultPoint_tooltip: '<b>%year %name</b><br>Revenue: <b>{%yValue:c2}B</b>',
+            defaultPoint_tooltip: '<b>%name</b><br>Heures: <b>%Valueh</b>',
             shape: { innerSize: '55%', size: '80%' },
-            palette: JSC.colorToPalette('#CC3F2B', { lightness: 0.4 }, 4, 0).concat(
-              JSC.colorToPalette('#F04339', { lightness: 0.4 }, 4, 0),
-              JSC.colorToPalette('#1314F0', { lightness: 0.4 }, 4, 0),
-              JSC.colorToPalette('#4B9DF0', { lightness: 0.4 }, 4, 0),
+            palette: JSC.colorToPalette('#F4CFDF', { lightness: 0.4 }, 3, 0).concat(
+              JSC.colorToPalette('#CA3C66', { lightness: 0.4 }, 4, 0),
+              JSC.colorToPalette('#9AC8EB', { lightness: 0.4 }, 4, 0),
+              JSC.colorToPalette('#5784BA', { lightness: 0.4 }, 4, 0),
             )
           }
         ]

@@ -34,7 +34,7 @@ class Event {
         } else if (this.summary.includes("TP")) {
             this.#type = "TP"; 
         } else {
-            this.#type = "AUTRE";
+            this.#type = "Autre";
         }
         this.#semestre = this.getSemester(summary);
         this.#category = this.getCategory(summary);
