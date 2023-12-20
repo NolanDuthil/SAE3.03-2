@@ -20,31 +20,33 @@ await M.init();
 
 let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
   
-  // Fonction pour extraire l'heure de fin pour chaque groupe
-  function extractEndTime(all) {
-    let dtEndMatch = all.match(/DTEND:(\d{8}T\d{6}Z)/);
-    let summaryMatch = all.match(/SUMMARY:[^]*BUT1-([^.]+)/);
+// Fonction pour extraire l'heure de fin pour chaque groupe
+function extractEndTime(events) {
+    let endTimes = {};
   
-    if (dtEndMatch && summaryMatch) {
-      let endTimeString = dtEndMatch[1];
-      let endTime = new Date(endTimeString);
+    events.forEach(eventData => {
+      const dtEndMatch = eventData.match(/DTEND:(\d{8}T\d{6}Z)/);
+      const summaryMatch = eventData.match(/SUMMARY:.*BUT1-([^.]+)/);
   
-      let groupsString = summaryMatch[1];
-      let groups = groupsString.split('.');
+      if (dtEndMatch && summaryMatch) {
+        const endTimeString = dtEndMatch[1];
+        const endTime = new Date(endTimeString);
   
-      let endTimes = {};
-      groups.forEach(group => {
-        endTimes[group] = endTime;
-      });
+        const groupsString = summaryMatch[1];
+        const groups = groupsString.split('.');
   
-      return endTimes;
-    }
+        groups.forEach(group => {
+          endTimes[group] = endTime;
+        });
+      }
+    });
   
-    return null; // Retourner null si les informations ne peuvent pas être extraites
+    return endTimes;
   }
   
-  // Appeler la fonction et afficher les résultats
-  let endTimes = extractEndTime(all);
+  // Appeler la fonction avec la liste des événements et afficher les résultats
+  let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
+  const endTimes = extractEndTime(all);
   console.log(endTimes);
         
         var chart = JSC.chart('chartDiv', {
