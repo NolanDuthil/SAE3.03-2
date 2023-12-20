@@ -18,7 +18,16 @@ import { V } from "./js/view.js";
 // loadind data (and wait for it !)
 await M.init();
   
-        
+var widgetOptions = [
+
+
+
+];
+
+var chart1 = new JSCWidgets.BarColumn('chartDiv1', widgetOptions[0]),
+chart2 = new JSCWidgets.BarColumn('chartDiv2', widgetOptions[1]),
+chart3 = new JSCWidgets.BarColumn('chartDiv3', widgetOptions[2]),
+chart4 = new JSCWidgets.BarColumn('chartDiv4', widgetOptions[3])
         var chart = JSC.chart('chartDiv', {
             debug: true,
             defaultSeries_type: 'column',
@@ -53,5 +62,7 @@ function handler_click(ev) {
         renderTimes(result);
     }
 }
+
+
 
 export { handler_click };
