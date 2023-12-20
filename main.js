@@ -18,6 +18,8 @@ import { V } from "./js/view.js";
 // loadind data (and wait for it !)
 await M.init();
 
+let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
+
 let hoursPerWeek = {};
 
 for (let event of all) {
