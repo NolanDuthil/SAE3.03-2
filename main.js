@@ -19,28 +19,7 @@ import { V } from "./js/view.js";
 await M.init();
 
 let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
-
-    function filterEventsByType(events, type) {
-        return events.filter(event => event.type === type);
-    }
-    
-    function renderTimes(events) {
-        // Filtrer les événements pour ne conserver que ceux de type "TP"
-        const tpEvents = filterEventsByType(events, 'TP');
-    
-        // Initialiser un objet pour stocker les heures de fin par jour pour chaque groupe de TP
-        const tpEndTimesByDay = {};
-    
-        // Boucler à travers les événements TP pour calculer les heures de fin par jour et par groupe
-        tpEvents.forEach(tpEvent => {
-            const dayOfWeek = tpEvent.start.getDay(); // Obtient le jour de la semaine (0-6, 0 étant dimanche)
-            const groupName = tpEvent.groups[0]; // Supposons que le groupe est le premier groupe dans la liste
-    
-            // Initialiser ou mettre à jour l'heure de fin maximale pour ce groupe et ce jour
-            if (!tpEndTimesByDay[groupName] || tpEndTimesByDay[groupName][dayOfWeek] < tpEvent.end) {
-                tpEndTimesByDay[groupName] = { [dayOfWeek]: tpEvent.end };
-            }
-        })
+        
         var chart = JSC.chart('chartDiv', {
             debug: true,
             defaultSeries_type: 'column',
@@ -62,37 +41,7 @@ let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3"
               { name: 'Vendredi', points: [19, 19,19.5,19,19, 19, 17.5,19,19,19,19,19] }
             ]
           });
-        ;
-    
-        // Construire le tableau de données pour le graphique
-        const chartData = Object.keys(tpEndTimesByDay).map(groupName => {
-            const dataPoints = [0, 0, 0, 0, 0]; // Un tableau pour chaque jour de la semaine (lundi à vendredi)
-    
-            Object.entries(tpEndTimesByDay[groupName]).forEach(([dayOfWeek, endTime]) => {
-                dataPoints[dayOfWeek] = calculateHoursDifference(tpEvents[0].start, endTime);
-            });
-    
-            return {
-                name: groupName,
-                points: dataPoints
-            };
-        });
-    
-        // ... Reste de votre code pour l'affichage du graphique
-    }
-    
-    function calculateHoursDifference(startTime, endTime) {
-        const diff = endTime.getTime() - startTime.getTime();
-        const totalMinutes = diff / (1000 * 60);
-        const hoursDecimal = totalMinutes / 60;
-        return hoursDecimal;
-    }
-    
-    // ...
-    
-    // Appeler la fonction de rendu avec tous les événements
-    renderTimes(all);
-
+          
 function handler_click(ev) {
     if (ev.target.id == 'group') {
         let result;
