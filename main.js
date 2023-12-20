@@ -60,7 +60,7 @@ let chartData = Object.keys(hoursPerWeek).map(week => ({
 // Le reste du code pour l'affichage du graphique reste inchangé
 var chart = JSC.chart('chartDiv', {
     debug: false,
-    defaultSeries_type: 'columnSolid',
+    defaultSeries_type: 'column',
     title_label_text: 'Heures de cours par semaine en MMI',
     yAxis: {
         defaultTick_enabled: true,
@@ -71,7 +71,7 @@ var chart = JSC.chart('chartDiv', {
     series: [
         {
             name: 'Heures de cours total',
-            color: 'turquoise',
+            color: '#ABA0F9',
             defaultPoint: {
                 label: { text: '%value' }
             },
