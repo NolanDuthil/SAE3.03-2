@@ -66,7 +66,7 @@ var chart = JSC.chart('chartDiv', {
         defaultTick_enabled: true,
         scale_range_padding: 0.15
     },
-    legend_visible: false,
+    legend_visible: true,
     toolbar_visible: false,
     series: [
         {
