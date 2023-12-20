@@ -138,9 +138,6 @@ function renderTimes(events) {
       });
 }
 
-
-renderTimes(all)
-
 renderTimes(all)
 
 function handler_click(ev) {
