@@ -17,14 +17,14 @@ import { V } from "./js/view.js";
 
 // loadind data (and wait for it !)
 await M.init();
-
-let all = [...M.getEvents("mmi1"), ...M.getEvents("mmi2"), ...M.getEvents("mmi3")];
   
 // Fonction pour extraire l'heure de fin pour chaque groupe
 function extractEndTime(events) {
     let endTimes = {};
   
-    events.forEach(eventData => {
+    events.forEach(event => {
+      const eventData = all; // Supposons que la propriété 'data' contient la chaîne de données de l'événement
+  
       const dtEndMatch = eventData.match(/DTEND:(\d{8}T\d{6}Z)/);
       const summaryMatch = eventData.match(/SUMMARY:.*BUT1-([^.]+)/);
   
