@@ -19,6 +19,28 @@ import { V } from "./js/view.js";
 await M.init();
   
 var widgetOptions = [
+    {
+        debug: false,
+        defaultSeries_type: 'column',
+        title_label_text: 'Heures de cours par semaine en MMI',
+        yAxis: {
+            defaultTick_enabled: true,
+            scale_range_padding: 0.15
+        },
+        legend_visible: true,
+        toolbar_visible: false,
+        series: [
+            {
+                name: 'Heures de cours total',
+                color: '#ABA0F9',
+                defaultPoint: {
+                    label: { text: '%value' }
+                },
+                points: chartData
+            }
+        ]
+    },
+
 
 
 
