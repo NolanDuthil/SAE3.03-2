@@ -57,7 +57,7 @@ function renderTimes(events) {
 
     var chart = JSC.chart('chartDiv', {
         debug: false,
-        type: 'column',
+        type: 'horizontalColumn',
         yAxis: {
             scale_type: 'stacked',
             label_text: 'Heures'
