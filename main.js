@@ -70,19 +70,24 @@ function renderTimes(events) {
         series: [
             {
                 name: 'TP',
-                points: Object.values(weeklyHours).map(week => week.TP)
+                points: Object.values(weeklyHours).map(week => week.TP),
+                color: '#74EC8D'
             },
             {
                 name: 'TD',
-                points: Object.values(weeklyHours).map(week => week.TD)
+                points: Object.values(weeklyHours).map(week => week.TD),
+                color: '#5CAFE7'
             },
             {
                 name: 'CM',
-                points: Object.values(weeklyHours).map(week => week.CM)
+                points: Object.values(weeklyHours).map(week => week.CM),
+                color: '#F08488'
+
             },
             {
                 name: 'Autre',
-                points: Object.values(weeklyHours).map(week => week.Autre)
+                points: Object.values(weeklyHours).map(week => week.Autre),
+                color: '#7D4FFE'
             }
         ]
     });
