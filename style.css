@@ -1,0 +1,15 @@
+.all{
+    background-color: rgba(81, 92, 230, 0.05);
+}
+
+.chartDiv{
+    border-radius: 2rem;
+}
+
+.select{
+        color: #7b38d8;
+        border: 2px solid #7b38d8;
+        border-radius: 0.25rem;
+        cursor: pointer;
+
+}
