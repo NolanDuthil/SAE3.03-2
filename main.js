@@ -17,41 +17,104 @@ import { V } from "./js/view.js";
 
 // loadind data (and wait for it !)
 await M.init();
-  
+
+let all = [...M.getEvents("mmi1"), ...M.getEvents('mmi2'), ...M.getEvents("mmi3")]
+console.log(all)
         
-        var chart = JSC.chart('chartDiv', {
-            debug: true,
-            defaultSeries_type: 'column',
-            title_label_text: 'Fin des cours',
-            yAxis: { label_text: 'Heures' },
-            xAxis: {
-              label_text: 'Groupe',
-              categories: ['BUT1-G1', 'BUT1-G21', 'BUT1-G22', 'BUT1-G3', 'BUT2-G1', 'BUT2-G21', 'BUT2-G22', 'BUT2-G3', 'BUT3-G1', 'BUT3-G21', 'BUT3-G22', 'BUT3-G3']
-            },
-            series: [
-              {
-                name: 'Lundi',
-                id: 's1',
-                points: [17, 16,19,19,14, 19, 19,18,19,19,19,19]
-              },
-              { name: 'Mardi', points: [19, 19,19,12,19, 19, 17,19,19,16,19,19] },
-              { name: 'Mercredi', points: [19, 19,19,17,19, 19, 19,19,19,19,11,19] },
-              { name: 'Jeudi', points: [19, 19,17,19,19, 19, 13,19,19,19,18,19] },
-              { name: 'Vendredi', points: [19, 19,19.5,19,19, 19, 17.5,19,19,19,19,19] }
-            ]
-          });
-          
+function renderTimes(data) {
+  var chart = JSC.chart('chartDiv', {
+      debug: true,
+      type: 'line',
+      legend_visible: true,
+      xAxis: {
+          crosshair_enabled: true,
+          scale: { type: 'time' }
+      },
+      yAxis: { orientation: 'opposite', },
+      defaultSeries: {
+          firstPoint_label_text: '<b>%seriesName</b>',
+          defaultPoint_marker: {
+              type: 'none',
+          }
+      },
+      defaultPoint: {
+          tooltip: '<b>%seriesName:</b> %valueh'
+      },
+      title_label_text: 'Heure de fin des cours par jour et par groupe',
+      series: data
+  });
+}
+
+function formatDataForChart(data) {
+  let formattedData = [];
+  data.forEach(groupData => {
+      let groupName = groupData[0];
+      let points = [];
+
+      for (let i = 1; i < groupData.length; i++) {
+          let date = groupData[i][0];
+          let value = groupData[i][1];
+          points.push([date, value]);
+      }
+
+      formattedData.push({
+          name: groupName,
+          points: points
+      });
+  });
+
+  renderTimes(formattedData);
+}
+
+function getDernierCours(events) {
+  let groupedEvents = {};
+
+  events.forEach(event => {
+      event.groups.forEach(group => {
+          if (!groupedEvents[group]) {
+              groupedEvents[group] = {};
+          }
+          let date = new Date(event.start);
+          let formattedDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+          let decimalEndTime = parseFloat(event.heurefin);
+          if (!groupedEvents[group][formattedDate] || decimalEndTime > groupedEvents[group][formattedDate]) {
+              groupedEvents[group][formattedDate] = decimalEndTime;
+          }
+      });
+  });
+
+  let tab = [];
+  for (let group in groupedEvents) {
+      let groupData = [group];
+      for (let date in groupedEvents[group]) {
+          groupData.push([date, groupedEvents[group][date]]);
+      }
+      tab.push(groupData);
+  }
+
+  console.log(tab)
+  formatDataForChart(tab)
+}
+
+getDernierCours(all)
+
 function handler_click(ev) {
-    if (ev.target.id == 'group') {
-        let result;
-        if (ev.target.value == "tout") {
-            result = all;
-        }
-        else {
-            result = M.EventAllByGroup(ev.target.value);
-        }
-        renderTimes(result);
-    }
+  if (ev.target.id == 'group') {
+      let result;
+      if (ev.target.value == "tout") {
+          result = all;
+      }
+      else {
+          result = M.EventAllByGroup("group", ev.target.value);
+      }
+      renderTimes(result);
+  }
+
+  if (ev.target.id == 'week') {
+      let result;
+      result = M.EventAllByGroup("week", ev.target.value);
+      getDernierCours(result);
+  }
 }
 
 export { handler_click };
