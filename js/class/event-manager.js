@@ -51,21 +51,34 @@ class EventManager {
         return this.#events.map(event => {
             let obj = event.toObject();
             obj.calendarId = this.#id;
-            obj.week = event.week; // Ajoute la propriété week à l'objet retourné
+            obj.week = event.week;
+            obj.groups = event.groups;
+            obj.duree = event.duree;
+            obj.semestre = event.semestre;
+            obj.category = event.category;
+            obj.heurefin = event.heurefin;
+            obj.end = event.end;
+            obj.day = event.day;
             return obj;
         });
     }
 
-    EventByGroup(value) {
-        let res;
-        res = this.#events.filter(event => event.groups.includes(value));
-
+    filterEvents(critere, value) {
+        let res = [];
+    
+        if (critere === 'group') {
+            res = this.#events.filter(event => event.groups.includes(value));
+        }
+        else if (critere === 'day') {
+            res = this.#events.filter(event => event.day.includes(value)); // Attention ici, la propriété 'day' n'existe pas dans vos objets d'événements. Peut-être vouliez-vous utiliser 'start' ou 'end'?
+        }
+    
         return res.map(event => {
             let obj = event.toObject();
             obj.calendarId = this.#id;
             return obj;
         });
-    }
+    }    
 }
 
 export { EventManager };

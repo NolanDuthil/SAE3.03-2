@@ -16,16 +16,15 @@ M.getEvents = function(annee) {
     return null;
 }
 
-M.EventAllByGroup = function(tag){
-    let A1 = Events.mmi1.EventByGroup(tag);
-    let A2 = Events.mmi2.EventByGroup(tag);
-    let A3 = Events.mmi3.EventByGroup(tag);
-
+M.filterByTag = function(crit, tag) {
+    let A1 = Events.mmi1.filterEvents(crit, tag);
+    let A2 = Events.mmi2.filterEvents(crit, tag);
+    let A3 = Events.mmi3.filterEvents(crit, tag);
     let result = [...A1, ...A2, ...A3];
     return result;
 }
 
-M.init = async function() {
+M.init = async function () {
     let data = await fetch('./data/mmi1.ics');
     data = await data.text();
     data = ical.parseICS(data);
@@ -35,7 +34,7 @@ M.init = async function() {
     let data2 = await fetch('./data/mmi2.ics');
     data2 = await data2.text();
     data2 = ical.parseICS(data2);
-    Events.mmi2= new EventManager('mmi2', 'MMI 2', 'Agenda des MMI 2');
+    Events.mmi2 = new EventManager('mmi2', 'MMI 2', 'Agenda des MMI 2');
     Events.mmi2.addEvents(data2);
 
     let data3 = await fetch('./data/mmi3.ics');
